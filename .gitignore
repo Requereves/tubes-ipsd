@@ -1,0 +1,26 @@
+
+# Dataset (Dilarang diunggah ke GitHub sesuai ketentuan docx)
+Data/Original Images/
+Data/Augmented Images/
+Data/*.xlsx
+Data/*.jpg
+data/
+*.zip
+*.tar*
+
+# Trained Model Weights / Checkpoints (Dilarang diunggah ke GitHub: *.pt, *.pth, *.h5, *caffe)
+checkpoints/
+*.pt
+*.pth
+*.h5
+*caffe*
+*.ckpt
+*.onnx
+
+# Python & Environment
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.env
+venv/
+env/

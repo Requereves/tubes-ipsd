@@ -1,65 +1,101 @@
-import os, sys
+import argparse
+import os
+import sys
+
+from src.train_eval import run_5fold_cv, train_and_eval_fold, get_device
 import torch
-import torch.nn as nn
-import matplotlib.pyplot as plt
-from torch.optim import Adam
-from Utils.getsData import get_train
-from Models import get_model
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Mpox Skin Lesion Classification - 5-Fold Cross Validation"
+    )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="regnet_y_800mf",
+        choices=["regnet_y_800mf", "convnext_tiny", "custom_cnn", "efficientnet_b0"],
+        help="Arsitektur model deep learning (selain baseline Kaggle ResNet50/VGG16)",
+    )
+    parser.add_argument(
+        "--device",
+        type=str,
+        default=None,
+        choices=["cuda", "cpu"],
+        help="Pilih device eksekusi secara eksplisit (default: otomatis deteksi GPU jika tersedia)",
+    )
+    parser.add_argument(
+        "--data_dir",
+        type=str,
+        default="Data",
+        help="Path ke direktori dataset (lokal atau Kaggle)",
+    )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=15,
+        help="Jumlah epoch per fold",
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=16,
+        help="Batch size dataloader",
+    )
+    parser.add_argument(
+        "--lr",
+        type=float,
+        default=1e-4,
+        help="Learning rate optimizer",
+    )
+    parser.add_argument(
+        "--img_size",
+        type=int,
+        default=224,
+        help="Resolusi dimensi citra (tinggi dan lebar)",
+    )
+    parser.add_argument(
+        "--results_dir",
+        type=str,
+        default="Results",
+        help="Direktori penyimpanan grafik evaluasi dan ringkasan metrik",
+    )
+    parser.add_argument(
+        "--num_workers",
+        type=int,
+        default=2,
+        help="Jumlah worker DataLoader",
+    )
+    parser.add_argument(
+        "--no_pretrained",
+        action="store_true",
+        help="Nonaktifkan bobot pretrained ImageNet jika menggunakan model pretrained",
+    )
+    parser.add_argument(
+        "--fold",
+        type=int,
+        default=None,
+        choices=[1, 2, 3, 4, 5],
+        help="Jalankan hanya 1 fold spesifik (1-5) untuk testing cepat. Kosongkan untuk menjalankan 5-fold CV penuh.",
+    )
+    return parser.parse_args()
+
 
 def main():
-    MODEL = sys.argv[1] if len(sys.argv) > 1 else "convnext"   
-    BATCH_SIZE = 32 if MODEL == "simple" else 16
-    EPOCH = 30 if MODEL == "simple" else 10
-    LEARNING_RATE = 1e-3 if MODEL == "simple" else 1e-4
-    dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    args = parse_args()
+    args.pretrained = not args.no_pretrained
 
+    # Pastikan folder output ada
+    os.makedirs(args.results_dir, exist_ok=True)
     os.makedirs("checkpoints", exist_ok=True)
-    os.makedirs("results", exist_ok=True)
 
-    for fold in range(1, 6):
-        train_loader, valid_loader = get_train(fold, BATCH_SIZE)
-        model = get_model(MODEL).to(dev)
-        optimizer = Adam(model.parameters(), lr=LEARNING_RATE)
-        loss_function = nn.CrossEntropyLoss()
+    if args.fold is not None:
+        device, _ = get_device(args.device)
+        print(f"Menjalankan evaluasi Fold {args.fold}...")
+        train_and_eval_fold(args.fold, args, device)
+    else:
+        run_5fold_cv(args)
 
-        loss_train_all, loss_valid_all = [], []
-        best_loss = float("inf")
-        for epoch in range(EPOCH):
-            train_loss, valid_loss = 0, 0
-
-            model.train()
-            for src, trg in train_loader:
-                src, trg = src.to(dev), trg.to(dev)
-                pred = model(src)
-                loss = loss_function(pred, trg)
-                train_loss += loss.item()
-
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-
-            model.eval()
-            with torch.no_grad():
-                for src, trg in valid_loader:
-                    src, trg = src.to(dev), trg.to(dev)
-                    valid_loss += loss_function(model(src), trg).item()
-
-            loss_train_all.append(train_loss / len(train_loader))
-            loss_valid_all.append(valid_loss / len(valid_loader))
-            print(f"fold {fold} | epoch {epoch+1} | train loss {loss_train_all[-1]:.4f} | valid loss {loss_valid_all[-1]:.4f}")
-
-    
-            if loss_valid_all[-1] < best_loss:
-                best_loss = loss_valid_all[-1]
-                torch.save(model.state_dict(), f"checkpoints/{MODEL}_fold{fold}.pt")
-
-        plt.figure()
-        plt.plot(range(EPOCH), loss_train_all, color="#931a00", label="Training")
-        plt.plot(range(EPOCH), loss_valid_all, color="#3399e6", label="Validation")
-        plt.xlabel("Epoch"); plt.ylabel("Loss"); plt.legend()
-        plt.title(f"{MODEL} - Fold {fold}")
-        plt.savefig(f"results/{MODEL}_training_fold{fold}.png")
-        plt.close()
 
 if __name__ == "__main__":
     main()
