@@ -5,6 +5,7 @@ from .CNN import SimpleCNN
 from .ConvNeXt import ConvNeXtTiny
 from .efficientnet_b0 import create_model as create_efficientnet
 from .mobilenet_v3 import create_model as create_mobilenet
+from .swin_t import create_model as create_swin
 
 NUM_CLASSES = 2  # GANTI sesuai jumlah kelas dataset-mu
 
@@ -36,6 +37,8 @@ def _efficientnet(n):
 def _mobilenet(n):
     return create_mobilenet(num_classes=n, pretrained=True)
 
+def _swin(n):
+    return create_swin(num_classes=n, pretrained=True)
 
 def _resnet50(n):
     m = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
@@ -58,6 +61,7 @@ _REGISTRY = {
     "efficientnet": _efficientnet,
     "densenet": _densenet,
     "mobilenet": _mobilenet,
+    "swin": _swin,      
 }
 
 
