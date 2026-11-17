@@ -128,8 +128,11 @@ def plot_multiclass_roc(y_true, y_prob, class_names, fold, save_dir="Results", m
     Menyimpan kurva ROC multiclass (One-vs-Rest) untuk set Test per fold.
     """
     os.makedirs(save_dir, exist_ok=True)
+    y_prob = np.asarray(y_prob)
     num_classes = len(class_names)
     y_true_bin = label_binarize(y_true, classes=list(range(num_classes)))
+    if num_classes == 2:
+        y_true_bin = np.hstack([1 - y_true_bin, y_true_bin])
 
     plt.figure(figsize=(9, 7))
 

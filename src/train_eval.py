@@ -134,9 +134,9 @@ def train_and_eval_fold(fold, args, device):
         pretrained=args.pretrained
     ).to(device)
 
-    # CrossEntropyLoss dengan label smoothing ringan untuk generalisasi
-    criterion = nn.CrossEntropyLoss(label_smoothing=0.05)
-    optimizer = AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
+    # CrossEntropyLoss dengan label smoothing untuk mereduksi overconfidence
+    criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
+    optimizer = AdamW(model.parameters(), lr=args.lr, weight_decay=1e-2)
     scheduler = CosineAnnealingLR(optimizer, T_max=args.epochs, eta_min=1e-6)
 
     best_val_loss = float("inf")

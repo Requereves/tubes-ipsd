@@ -52,7 +52,7 @@ class CustomCNN(nn.Module):
         return x
 
 
-def build_model(model_name="regnet_y_800mf", num_classes=6, pretrained=True):
+def build_model(model_name="regnet_y_800mf", num_classes=6, pretrained=True, dropout_rate=0.4):
     """
     Model Factory untuk menginisialisasi model deep learning.
     Pilihan model:
@@ -67,7 +67,10 @@ def build_model(model_name="regnet_y_800mf", num_classes=6, pretrained=True):
         weights = models.RegNet_Y_800MF_Weights.DEFAULT if pretrained else None
         model = models.regnet_y_800mf(weights=weights)
         in_features = model.fc.in_features
-        model.fc = nn.Linear(in_features, num_classes)
+        model.fc = nn.Sequential(
+            nn.Dropout(p=dropout_rate),
+            nn.Linear(in_features, num_classes),
+        )
         return model
 
     elif "convnext" in model_key:

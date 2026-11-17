@@ -112,26 +112,30 @@ def get_fold_loaders(data_dir="Data", fold=1, batch_size=16, img_size=224, num_w
     # Di Windows, multiprocessing DataLoader bisa membutuhkan num_workers=0 jika ada issue IPC
     nw = num_workers if os.name != "nt" else 0
 
+    # Gunakan pin_memory hanya jika accelerator (CUDA) tersedia
+    import torch
+    use_pin = torch.cuda.is_available()
+
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
         shuffle=True,
         num_workers=nw,
-        pin_memory=True
+        pin_memory=use_pin
     )
     val_loader = DataLoader(
         valid_dataset,
         batch_size=batch_size,
         shuffle=False,
         num_workers=nw,
-        pin_memory=True
+        pin_memory=use_pin
     )
     test_loader = DataLoader(
         test_dataset,
         batch_size=batch_size,
         shuffle=False,
         num_workers=nw,
-        pin_memory=True
+        pin_memory=use_pin
     )
 
     return train_loader, val_loader, test_loader, class_names

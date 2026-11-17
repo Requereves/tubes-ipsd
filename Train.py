@@ -45,7 +45,7 @@ def parse_args():
     parser.add_argument(
         "--lr",
         type=float,
-        default=1e-4,
+        default=5e-5,
         help="Learning rate optimizer",
     )
     parser.add_argument(
