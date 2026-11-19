@@ -49,11 +49,11 @@ Bobot model disimpan di `checkpoints/` dan di-ignore oleh git.
 
 | Metrik | ConvNeXt-Tiny | ConvNeXt-Tiny + CLAHE | Custom CNN |
 |---|---|---|---|
-| Accuracy | 0.xxxx ± 0.xxxx | 0.xxxx ± 0.xxxx | 0.xxxx ± 0.xxxx |
-| Precision (macro) | | | |
-| Recall (macro) | | | |
-| F1-score (macro) | | | |
-| ROC-AUC (macro OvR) | | | |
+| Accuracy | 0.844854 ± 0.029537 | 0.xxxx ± 0.xxxx | 0.xxxx ± 0.xxxx |
+| Precision (macro) | 0.862267 ± 0.048321 | | |
+| Recall (macro) | 0.800044 ± 0.047329 | | |
+| F1-score (macro) | 0.814741 ± 0.045745 | | |
+| ROC-AUC (macro OvR) | 0.961375 ± 0.015657 | | |
 
 ### Gambar
 > Ganti nama file sesuai hasil di folder `Results/`
