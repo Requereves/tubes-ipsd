@@ -45,17 +45,9 @@ def parse_args():
     parser.add_argument(
         "--lr",
         type=float,
-        default=None,
-        help="Learning rate (default: 1e-3 untuk custom_cnn, 5e-5 untuk model pretrained)",
+        default=5e-5,
+        help="Learning rate optimizer",
     )
-    parser.add_argument(
-        "--preprocess",
-        type=str,
-        default="none",
-        choices=["none", "clahe"],
-        help="Pre-processing gambar: none (resize saja) atau clahe",
-    )
-    parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument(
         "--img_size",
         type=int,
@@ -92,12 +84,6 @@ def parse_args():
 def main():
     args = parse_args()
     args.pretrained = not args.no_pretrained
-    if args.lr is None:
-        args.lr = 1e-3 if args.model == "custom_cnn" else 5e-5
-
-    import random
-    import numpy as np
-    random.seed(args.seed); np.random.seed(args.seed); torch.manual_seed(args.seed)
 
     # Pastikan folder output ada
     os.makedirs(args.results_dir, exist_ok=True)
