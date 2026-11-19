@@ -49,7 +49,7 @@ Bobot model disimpan di `checkpoints/` dan di-ignore oleh git.
 
 | Metrik | ConvNeXt-Tiny | RegNetY-800MF | Custom CNN |
 |---|---|---|---|
-| Accuracy | 0.844854 ± 0.029537 | 0.xxxx ± 0.xxxx | 0.6081|
+| Accuracy | 0.844854 ± 0.029537 | 0.8107 ± 0.0225 | 0.6081|
 | Precision (macro) | 0.862267 ± 0.048321 | | 0.5653 |
 | Recall (macro) | 0.800044 ± 0.047329 | | 0.4816 |
 | F1-score (macro) | 0.814741 ± 0.045745 | | 0.4738 |
